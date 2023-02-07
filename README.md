@@ -10,81 +10,63 @@ Connect through SSH to remote Debian server and update repositories and install 
 
 ```
 sudo apt-get update ; \
-sudo apt-get install -y vim mosh tmux htop git curl wget unzip zip gcc build-essential make
+sudo apt-get install -y vim tmux htop git curl wget unzip zip gcc build-essential make
 ```
 
 Configure SSH:
 
-```
-sudo vim /etc/ssh/sshd_config
-    AllowUsers www
-    PermitRootLogin no
-    PasswordAuthentication no
-```
-
-Restart SSH server, change `www` user password:
-
-```
-sudo service ssh restart
-sudo passwd www
-```
-
-## Init — must-have packages & ZSH
-
-```
-sudo apt-get install -y zsh tree redis-server nginx zlib1g-dev libbz2-dev libreadline-dev llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev liblzma-dev python3-dev python-imaging python3-lxml libxslt-dev python-libxml2 python-libxslt1 libffi-dev libssl-dev python-dev gnumeric libsqlite3-dev libpq-dev libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev libcurl4-openssl-dev supervisor
-```
-
-Install [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh):
-
-```
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-```
-
-Configure some needed aliases:
-
-```
-vim ~/.zshrc
-    alias cls="clear"
-```
-
-## Install python 3.7
+## Install python 3.11
 
 mkdir ~/code
 
 Build from source python 3.7, install with prefix to ~/.python folder:
 
 ```
-wget https://www.python.org/ftp/python/3.7.3/Python-3.7.3.tgz ; \
-tar xvf Python-3.7.* ; \
-cd Python-3.7.3 ; \
-mkdir ~/.python ; \
-./configure --enable-optimizations --prefix=/home/www/.python ; \
-make -j8 ; \
-sudo make altinstall
-```
+python3 --version
+sudo apt install python3.11
+apt install python3-pip
 
-Now python3.7 in `/home/www/.python/bin/python3.7`. Update pip:
 
-```
-sudo /home/www/.python/bin/python3.7 -m pip install -U pip
-```
+
 
 Ok, now we can pull our project from Git repository (or create own), create and activate Python virtual environment:
 
 ```
-cd code
-git pull project_git
-cd project_dir
-python3.7 -m venv env
+git config:
+cd ./code/project
+git branch -m main
+git config --global user.name "Name Surname"
+git config --global user.email sudobasil@gmail.com
+git config --global init.defaultBranch main
+
+//git pull project_git
+## install virtual inviroment
+apt install python3.11-venv
+
+python3.11 -m venv env
 . ./env/bin/activate
 ```
 
 ## Install and configure PostgreSQL
 
-Install PostgreSQL 11 and configure locales.
+Install PostgreSQL 
 
 ```
+https://www.postgresql.org/download/linux/ubuntu/
+# Create the file repository configuration:
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Import the repository signing key:
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+# Update the package lists:
+sudo apt-get update
+
+# Install the latest version of PostgreSQL.
+# If you want a specific version, use 'postgresql-12' or similar instead of 'postgresql':
+sudo apt-get -y install postgresql
+```
+
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - ; \
 RELEASE=$(lsb_release -cs) ; \
 echo "deb http://apt.postgresql.org/pub/repos/apt/ ${RELEASE}"-pgdg main | sudo tee  /etc/apt/sources.list.d/pgdg.list ; \
